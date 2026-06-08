@@ -1,11 +1,38 @@
 'use client'
 
+import { useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
-import { X, Minus, Plus, ShoppingBag } from 'lucide-react'
+import { X, Minus, Plus, ShoppingBag, Loader2 } from 'lucide-react'
 import { useCart } from './cart-context'
 
 export function CartDrawer() {
   const { items, isOpen, close, setQty, total, remove } = useCart()
+  const [loading, setLoading] = useState(false)
+
+  async function handleCheckout() {
+    setLoading(true)
+    try {
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: items.map(({ id, name, price, qty, image }) => ({
+            id,
+            name,
+            price,
+            qty,
+            image,
+          })),
+        }),
+      })
+      const { url, error } = await res.json()
+      if (error || !url) throw new Error(error ?? 'No checkout URL')
+      window.location.href = url
+    } catch (err) {
+      console.error('Checkout error:', err)
+      setLoading(false)
+    }
+  }
 
   return (
     <AnimatePresence>
@@ -128,9 +155,18 @@ export function CartDrawer() {
                   </div>
                   <button
                     type="button"
-                    className="w-full rounded-full bg-primary py-3.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+                    onClick={handleCheckout}
+                    disabled={loading}
+                    className="flex w-full items-center justify-center gap-2 rounded-full bg-primary py-3.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-70"
                   >
-                    Secure Checkout
+                    {loading ? (
+                      <>
+                        <Loader2 className="size-4 animate-spin" />
+                        Redirecting…
+                      </>
+                    ) : (
+                      'Secure Checkout'
+                    )}
                   </button>
                   <p className="mt-3 text-center text-xs text-muted-foreground">
                     Apple Pay · Google Pay · Stripe · Guest checkout available
