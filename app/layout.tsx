@@ -18,7 +18,6 @@ export const metadata: Metadata = {
   title: 'Sherpa Dairy — Pure Himalayan Goodness, Crafted Above the Clouds',
   description:
     'Authentic Chhurpi dog chews, traditional Himalayan Ghee, and premium artisanal dairy products sourced from the high mountains of Nepal. Export quality, 100% natural.',
-  generator: 'v0.app',
   openGraph: {
     title: 'Sherpa Dairy — Pure Himalayan Goodness',
     description:
